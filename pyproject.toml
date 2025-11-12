@@ -1,0 +1,19 @@
+[project]
+name = "housets"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "evidently>=0.7.15",
+    "fastapi>=0.120.4",
+    "great-expectations>=1.8.1",
+    "lightgbm>=4.6.0",
+    "matplotlib>=3.10.7",
+    "mlflow>=3.5.1",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.7.2",
+    "streamlit>=1.51.0",
+    "xgboost>=3.1.1",
+]

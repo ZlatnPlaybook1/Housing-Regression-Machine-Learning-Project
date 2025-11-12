@@ -1,0 +1,50 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+.env/
+*.env/
+
+# ==========================================
+# Project-specific ignores
+# ==========================================
+
+# Datasets (raw + processed)
+Data/
+
+# MLflow experiment tracking
+mlruns/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+
+# Jupyter runtime files
+.jupyter/
+*.nbconvert.ipynb
+
+# Logs
+logs/
+*.log
+
+
+# Cache & temp
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Docker
+*.pid
+*.tar
+*.lock.json
