@@ -48,3 +48,6 @@ Thumbs.db
 *.pid
 *.tar
 *.lock.json
+
+# Prediction file
+prediction.csv
