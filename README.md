@@ -40,7 +40,46 @@ The codebase is organized into distinct pipelines following the flow:
 
 ### Cloud Infrastructure & Deployment
 
+The project is deployed on Google Cloud Platform (GCP) with the following architecture:
 
+#### **Container Registry**
+- Docker images stored in Google Container Registry (GCR)
+- Automated builds triggered via Cloud Build or CI/CD pipeline
+```bash
+# Tag and push API image to GCR
+docker tag housing-regression gcr.io/[PROJECT_ID]/housing-regression:latest
+docker push gcr.io/[PROJECT_ID]/housing-regression:latest
+
+# Tag and push Streamlit image to GCR
+docker tag housing-streamlit gcr.io/[PROJECT_ID]/housing-streamlit:latest
+docker push gcr.io/[PROJECT_ID]/housing-streamlit:latest
+```
+
+#### **Cloud Run Services**
+- **API Service**: FastAPI deployed on Cloud Run for serverless inference
+- **Dashboard Service**: Streamlit app deployed on Cloud Run for interactive predictions
+```bash
+# Deploy API to Cloud Run
+gcloud run deploy housing-api \
+  --image gcr.io/[PROJECT_ID]/housing-regression:latest \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8000 \
+  --memory 2Gi \
+  --cpu 2
+
+# Deploy Streamlit dashboard to Cloud Run
+gcloud run deploy housing-dashboard \
+  --image gcr.io/[PROJECT_ID]/housing-streamlit:latest \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8501 \
+  --memory 2Gi \
+  --cpu 1 \
+  --set-env-vars API_URL=https://housing-api-[hash].run.app
+```
 
 
 ### Data Leakage Prevention
@@ -106,3 +145,85 @@ python src/inference_pipeline/inference.py --input data/raw/holdout.csv --output
 # Batch monthly predictions
 python src/batch/run_monthly.py
 
+### API Service
+```bash
+# Start FastAPI server locally
+uv run uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+```
+
+### Streamlit Dashboard
+```bash
+# Start Streamlit dashboard locally
+streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+```
+
+### Docker
+```bash
+# Build API container
+docker build -t housing-regression .
+
+# Build Streamlit container  
+docker build -t housing-streamlit -f Dockerfile.streamlit .
+
+# Run API container
+docker run -p 8000:8000 housing-regression
+
+# Run Streamlit container
+docker run -p 8501:8501 housing-streamlit
+```
+
+### MLflow Tracking
+```bash
+# Start MLflow UI (view experiments)
+mlflow ui
+```
+
+## Key Design Patterns
+
+### Pipeline Modularity
+Each pipeline component can be run independently with consistent interfaces. All modules accept configurable input/output paths for testing isolation.
+
+### Cloud-Native Architecture
+- **GCS-First Storage**: Models and data automatically sync from Google Cloud Storage buckets
+- **Containerized Services**: Both API and dashboard run in Docker containers deployed on Cloud Run
+- **Auto-scaling Infrastructure**: Cloud Run provides serverless container scaling with automatic scale-to-zero
+- **Environment-based Configuration**: Separate configs for local development and production using Cloud Run environment variables
+
+### Encoder Persistence  
+Frequency and target encoders are saved as pickle files during training and loaded during inference to ensure consistent transformations. Encoders are stored in GCS for persistence across container instances.
+
+### Configuration Management
+Model parameters, file paths, and pipeline settings use sensible defaults but can be overridden through function parameters or environment variables. Production deployments use GCP environment variables and Secret Manager for sensitive configurations.
+
+### Testing Strategy
+- Unit tests for individual pipeline components
+- Integration tests for end-to-end pipeline flows  
+- Smoke tests for inference pipeline
+- All tests use temporary directories to avoid touching production data
+- CI/CD pipeline via Cloud Build runs full test suite before deployment
+
+### Cloud Storage Integration
+- **Model Artifacts**: XGBoost models and preprocessing objects stored in `gs://[PROJECT_ID]-housing-models/`
+- **Data Buckets**: Raw and processed data in `gs://[PROJECT_ID]-housing-data/`
+- **Automatic Sync**: Services pull latest models from GCS on startup
+- **Versioning**: Model versions tracked via MLflow with GCS backend storage
+
+
+## Dependencies
+Key production dependencies (see `pyproject.toml`):
+- **ML/Data**: `xgboost==3.1.1`, `scikit-learn`, `pandas==2.3.3`, `numpy==2.3.4`
+- **API**: `fastapi`, `uvicorn`
+- **Dashboard**: `streamlit`, `plotly`
+- **Cloud**: `google-cloud-storage`, `google-cloud-secret-manager` (GCP integration)
+- **Experimentation**: `mlflow`, `optuna`
+- **Quality**: `great-expectations`, `evidently`
+
+## File Structure Notes
+- **`Data/`**: Raw, processed, and prediction data (time-structured, GCS-synced)
+- **`models/`**: Trained models and encoders (pkl files, GCS-synced)
+- **`mlruns/`**: MLflow experiment tracking data (backed by GCS)
+- **`notebooks/`**: Jupyter notebooks for EDA and experimentation
+- **`tests/`**: Comprehensive test suite with sample data
+- **`Dockerfile`**: API service containerization
+- **`Dockerfile.streamlit`**: Dashboard service containerization
+- **CI/CD**: `.github/workflows/ci.yml` or Cloud Build triggers for automated deployment to Cloud Run
