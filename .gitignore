@@ -1,29 +1,50 @@
+# ==========================================
 # Python-generated files
+# ==========================================
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
 
+# ==========================================
 # Virtual environments
+# ==========================================
 .venv/
+venv/
+.env
 .env/
-*.env/
+*.env
+.env.*
+*.venv/
+
+# ==========================================
+# Environment & Secret Keys (VERY IMPORTANT)
+# ==========================================
+# Local environment variables
+.env
+.env.*
+# Google Cloud credentials / service account keys
+keys/
+*.json
 
 # ==========================================
 # Project-specific ignores
 # ==========================================
-
 # Datasets (raw + processed)
 Data/
+data/
+datasets/
 
 # MLflow experiment tracking
 mlruns/
 
 # Notebook checkpoints
 .ipynb_checkpoints/
-
 
 # Jupyter runtime files
 .jupyter/
@@ -33,14 +54,14 @@ mlruns/
 logs/
 *.log
 
-
-# Cache & temp
+# Cache & temp files
 *.tmp
 *.swp
 .DS_Store
 Thumbs.db
+__MACOSX/
 
-# VSCode / IDE
+# VSCode / IDE settings
 .vscode/
 .idea/
 
@@ -51,3 +72,19 @@ Thumbs.db
 
 # Prediction file
 prediction.csv
+
+# Streamlit cache
+.streamlit/
+
+# Plotly outputs
+*.html
+
+# Model files (optional, if large)
+*.h5
+*.pkl
+*.joblib
+*.sav
+
+# Python bytecode cache
+*.pyc
+*.pyo
