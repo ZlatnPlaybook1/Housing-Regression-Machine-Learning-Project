@@ -1,0 +1,29 @@
+# Core ML stack
+numpy>=2.3.4
+pandas>=2.3.3
+scikit-learn>=1.7.2
+xgboost>=3.1.1
+lightgbm>=4.6.0
+joblib>=1.4.2
+category-encoders>=2.6.0
+
+# Serving / API
+fastapi>=0.120.4
+uvicorn>=0.30.0
+pydantic>=2.8.0
+
+# Visualization / monitoring
+matplotlib>=3.10.7
+evidently>=0.7.15
+great-expectations>=1.8.1
+streamlit>=1.51.0
+
+# Tracking
+mlflow>=3.5.1
+
+# Cloud storage (Google)
+google-cloud-storage>=2.16.0
+google-auth>=2.29.0
+
+# Utils
+python-dotenv>=1.0.1
