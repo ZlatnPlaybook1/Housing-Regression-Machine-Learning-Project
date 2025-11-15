@@ -226,4 +226,3 @@ Key production dependencies (see `pyproject.toml`):
 - **`tests/`**: Comprehensive test suite with sample data
 - **`Dockerfile`**: API service containerization
 - **`Dockerfile.streamlit`**: Dashboard service containerization
-- **CI/CD**: `.github/workflows/ci.yml` or Cloud Build triggers for automated deployment to Cloud Run
